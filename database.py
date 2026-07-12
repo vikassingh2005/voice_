@@ -35,3 +35,9 @@ async def clear_logs():
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("DELETE FROM command_logs")
         await db.commit()
+
+async def get_total_commands():
+    async with aiosqlite.connect(DB_PATH) as db:
+        async with db.execute("SELECT COUNT(*) FROM command_logs") as cursor:
+            row = await cursor.fetchone()
+            return row[0] if row else 0
