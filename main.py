@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from database import init_db, log_command, get_recent_logs, clear_logs
+from database import init_db, log_command, get_recent_logs, clear_logs, get_total_commands
 from contextlib import asynccontextmanager
 from command_parser import parse_command
 from system_control import SystemController
@@ -578,10 +578,10 @@ async def api_clear_logs():
 
 @app.get("/api/v1/stats")
 async def api_stats():
-    logs = await get_recent_logs(1000)
+    total_commands = await get_total_commands()
     return {
         "status": "success",
-        "total_commands": len(logs),
+        "total_commands": total_commands,
         "service": SERVICE_NAME.lower()
     }
 
