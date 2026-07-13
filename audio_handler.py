@@ -169,6 +169,10 @@ class AudioHandler:
                         state = _VadState.PAUSING
                         silence_count = 1
                         logger.debug("Entered PAUSING …")
+                    elif len(buffer) >= config.MAX_UTTERANCE_FRAMES:
+                        logger.debug(f"Forcing endpoint: hit maximum utterance limit of {config.MAX_UTTERANCE_SECONDS}s.")
+                        state = _VadState.ENDPOINT
+                        break
 
                 elif state is _VadState.PAUSING:
                     buffer.append(frame.tobytes())
@@ -184,6 +188,11 @@ class AudioHandler:
                             )
                             state = _VadState.ENDPOINT
                             break
+
+                    if len(buffer) >= config.MAX_UTTERANCE_FRAMES:
+                        logger.debug(f"Forcing endpoint: hit maximum utterance limit of {config.MAX_UTTERANCE_SECONDS}s.")
+                        state = _VadState.ENDPOINT
+                        break
 
         finally:
             stream.stop_stream()

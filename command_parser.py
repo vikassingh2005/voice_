@@ -247,10 +247,10 @@ def parse_command(text: str) -> tuple[str, dict]:
         return ("processes", {})
 
     # ====== TIMERS / REMINDERS ======
-    timer_match = re.search(r'(?:set\\s+(?:a\\s+)?timer|remind\\s+me\\s+in|countdown)\\s+(?:for\\s+)?(.+?)$', text)
+    timer_match = re.search(r'(?:set\s+(?:a\s+)?timer|countdown)\s+(?:for\s+)?(.+?)$', text)
     if timer_match:
         raw = timer_match.group(1).strip().rstrip('.')
-        m = re.search(r'^(\\d+)\\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?)\\s+(?:to\\s+|for\\s+)?(.+)?$', raw)
+        m = re.search(r'^(\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?)(?:\s+(?:to\s+|for\s+)?(.*))?$', raw)
         if m:
             value = int(m.group(1))
             unit = m.group(2)
@@ -265,10 +265,10 @@ def parse_command(text: str) -> tuple[str, dict]:
             return ("set_timer", {"text": note, "seconds": str(secs)})
         return ("set_timer", {"text": raw, "seconds": "60"})
 
-    reminder_match = re.search(r'(?:set\\s+(?:a\\s+)?reminder|remind\\s+me)(?:\\s+to\\s+)?(.+)$', text)
+    reminder_match = re.search(r'(?:set\s+(?:a\s+)?reminder|remind\s+me)(?:\s+to\s+)?(.+)$', text)
     if reminder_match:
         raw = reminder_match.group(1).strip().rstrip('.')
-        m = re.search(r'^(?:in\\s+)?(\\d+)\\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?)\\s+(?:to\\s+|for\\s+)?(.+)?$', raw)
+        m = re.search(r'^(?:in\s+)?(\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?)(?:\s+(?:to\s+|for\s+)?(.*))?$', raw)
         if m:
             value = int(m.group(1))
             unit = m.group(2)

@@ -151,8 +151,8 @@ class Scheduler:
                 "kind": item["kind"],
                 "text": item["text"]
             }))
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error(f"Error in scheduler driver: {e}")
 
     def list(self):
         with self._lock:
@@ -322,8 +322,10 @@ async def broadcast_status(data: dict):
     for client in ws_clients[:]:
         try:
             await client.send_json(data)
-        except:
-            ws_clients.remove(client)
+        except Exception as e:
+            logger.warning(f"Failed to send status to websocket client: {e}")
+            if client in ws_clients:
+                ws_clients.remove(client)
 
 # ====== BACKGROUND VOICE ASSISTANT LOOP ======
 def voice_assistant_loop():
@@ -461,6 +463,7 @@ async def core_status():
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             resp = await client.get(f"{config.OLLAMA_HOST}/api/tags")
+            resp.raise_for_status()
             data = resp.json()
             models = [m.get("name", "") for m in data.get("models", [])]
             return {
@@ -470,7 +473,17 @@ async def core_status():
                 "models": models,
                 "model_ready": config.OLLAMA_MODEL in models,
             }
-    except Exception:
+    except httpx.RequestError as e:
+        logger.warning(f"Ollama connection error: {e}")
+        return {
+            "status": "offline",
+            "ollama": False,
+            "model": config.OLLAMA_MODEL,
+            "models": [],
+            "model_ready": False,
+        }
+    except httpx.HTTPStatusError as e:
+        logger.warning(f"Ollama HTTP error: {e}")
         return {
             "status": "offline",
             "ollama": False,

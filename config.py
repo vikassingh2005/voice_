@@ -51,6 +51,8 @@ VAD_THRESHOLD: float = 0.5        # Silero confidence threshold
 VAD_SPEECH_PAD_MS: int = 300      # ms of extra audio kept around speech
 ENDPOINT_SILENCE_MS: int = 900    # ms of silence before cutting the utterance
 ENDPOINT_SILENCE_FRAMES: int = ENDPOINT_SILENCE_MS // MIC_CHUNK_MS
+MAX_UTTERANCE_SECONDS: int = 30   # max duration of an utterance before forcing endpoint
+MAX_UTTERANCE_FRAMES: int = (MAX_UTTERANCE_SECONDS * 1000) // MIC_CHUNK_MS
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Wake-word

@@ -262,7 +262,7 @@ class SystemController:
         try:
             subprocess.Popen(["xdg-open", app_name], start_new_session=True)
             return f"Opening {app_name}, sir."
-        except:
+        except OSError:
             pass
 
         return f"I couldn't find {app_name}. Try specifying the full command."
@@ -368,10 +368,10 @@ class SystemController:
         try:
             try:
                 subprocess.run(["gnome-screenshot", "-f", str(filepath)], check=True)
-            except:
+            except (FileNotFoundError, subprocess.CalledProcessError):
                 try:
                     subprocess.run(["scrot", str(filepath)], check=True)
-                except:
+                except (FileNotFoundError, subprocess.CalledProcessError):
                     raise ImportError("No screenshot tool available")
             return f"Screenshot saved to {filepath}"
         except Exception as e:
@@ -500,7 +500,7 @@ class SystemController:
             battery = psutil.sensors_battery()
             if battery:
                 info.append(f"Battery: {battery.percent}% {'(Plugged in)' if battery.power_plugged else '(On battery)'}")
-        except:
+        except (AttributeError, NotImplementedError):
             pass
 
         boot_time = datetime.fromtimestamp(psutil.boot_time())
@@ -529,7 +529,7 @@ class SystemController:
         for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
             try:
                 processes.append(proc.info)
-            except:
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 pass
         processes.sort(key=lambda x: x.get('cpu_percent', 0), reverse=True)
         result = "Top processes by CPU:\n"
@@ -545,7 +545,7 @@ class SystemController:
                 if name.lower() in proc.info['name'].lower():
                     proc.kill()
                     killed.append(proc.info['name'])
-            except:
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 pass
         if killed:
             return f"Killed {len(killed)} process(es): {', '.join(set(killed))}"
@@ -591,7 +591,7 @@ class SystemController:
                     try:
                         subprocess.run(cmd, check=True)
                         return "Locking your workstation, sir."
-                    except:
+                    except (FileNotFoundError, subprocess.CalledProcessError):
                         continue
             elif self.os_name == "darwin":
                 subprocess.run(["osascript", "-e", 'tell app "System Events" to sleep'])
@@ -722,9 +722,18 @@ class SystemController:
         if trimmed.startswith('bg '):
             background = True
             command = trimmed[3:].strip()
+
+        try:
+            parsed_command = shlex.split(command)
+        except ValueError as e:
+            return f"Invalid command syntax: {e}"
+
+        if not parsed_command:
+            return "Empty command provided."
+
         try:
             if background:
-                proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                proc = subprocess.Popen(parsed_command, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 job = {
                     "id": str(len(self._bg_jobs) + 1),
                     "command": command,
@@ -734,8 +743,8 @@ class SystemController:
                 self._bg_jobs.append(job)
                 return f"Started background job [{job['id']}] PID {proc.pid}: {command}"
             result = subprocess.run(
-                command,
-                shell=True,
+                parsed_command,
+                shell=False,
                 capture_output=True,
                 text=True,
                 timeout=30
@@ -746,6 +755,8 @@ class SystemController:
             return output[:1000]  # Limit output length
         except subprocess.TimeoutExpired:
             return "Command timed out."
+        except FileNotFoundError:
+            return f"Command not found: {parsed_command[0]}"
         except Exception as e:
             return f"Command failed: {e}"
 
