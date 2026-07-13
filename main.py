@@ -423,6 +423,10 @@ async def startup_event():
     global voice_active
     # Start background voice loop thread
     voice_active = True
+
+    # ⚡ Bolt: Initialize cpu_percent baseline so interval=None works correctly
+    psutil.cpu_percent(interval=None)
+
     threading.Thread(target=voice_assistant_loop, daemon=True).start()
 
 # ====== API ROUTES ======
@@ -587,7 +591,9 @@ async def api_stats():
 
 @app.get("/api/v1/metrics")
 async def api_metrics():
-    cpu = psutil.cpu_percent(interval=0.5)
+    # ⚡ Bolt: Use interval=None to prevent blocking the async event loop for 0.5s.
+    # Since this endpoint is polled every 2.5s, it will return the CPU usage over that period.
+    cpu = psutil.cpu_percent(interval=None)
     mem = psutil.virtual_memory()
     disk = psutil.disk_usage("/")
     net = psutil.net_io_counters()
