@@ -1132,3 +1132,13 @@ body.state-error .orb-status-icons { color: #ff5252 !important; opacity: 0.9 !im
     .sidebar { display: none; }
     .topbar-nav { display: none; }
 }
+
+/* Accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
