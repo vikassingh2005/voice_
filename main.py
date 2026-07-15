@@ -586,7 +586,13 @@ async def api_stats():
     }
 
 @app.get("/api/v1/metrics")
-async def api_metrics():
+def api_metrics():
+    """
+    ⚡ Bolt Optimization:
+    Changed from `async def` to `def` because `psutil.cpu_percent(interval=0.5)` is a blocking call.
+    Using `async def` blocked the entire FastAPI event loop for 0.5s every time the frontend polled metrics (every 2.5s).
+    By using `def`, FastAPI runs this in an external threadpool, unblocking the main thread and keeping the app responsive.
+    """
     cpu = psutil.cpu_percent(interval=0.5)
     mem = psutil.virtual_memory()
     disk = psutil.disk_usage("/")
