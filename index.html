@@ -360,7 +360,7 @@ if (location.protocol === 'file:') {
                     <div class="panel-chat-header">
                         <span class="panel-title">CONVERSATION</span>
                         <span class="live-status"><span class="live-dot"></span>LIVE</span>
-                        <button class="chat-clear" id="chatClear" title="Clear conversation">
+                        <button class="chat-clear" id="chatClear" title="Clear conversation" aria-label="Clear Chat">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                                 <polyline points="3 6 5 6 21 6"/>
                                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -393,8 +393,8 @@ if (location.protocol === 'file:') {
                             <button class="chip" data-cmd="clear chat">Clear Chat</button>
                         </div>
                         <div class="chat-input-line">
-                            <input class="chat-input" id="chatInput" placeholder="Type a command or ask anything..." spellcheck="false">
-                            <button class="chat-send" id="chatSend" title="Send">
+                            <input class="chat-input" id="chatInput" placeholder="Type a command or ask anything..." spellcheck="false" aria-label="Chat Input">
+                            <button class="chat-send" id="chatSend" title="Send" aria-label="Send Message">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="22" y1="2" x2="11" y2="13"/>
                                     <polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -414,7 +414,7 @@ if (location.protocol === 'file:') {
                     <span class="voicebar-status-pill-dot"></span>
                     <span class="voicebar-status-pill-text" id="voicePillText">PRAVAHA ONLINE</span>
                 </div>
-                <button class="voicebar-mic" id="voiceMic">
+                <button class="voicebar-mic" id="voiceMic" title="Toggle Microphone" aria-label="Toggle Microphone">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
                         <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
