@@ -586,7 +586,10 @@ async def api_stats():
     }
 
 @app.get("/api/v1/metrics")
-async def api_metrics():
+def api_metrics():
+    # Optimization: using synchronous def instead of async def so that the blocking
+    # call psutil.cpu_percent(interval=0.5) executes in FastAPI's external threadpool
+    # without blocking the main asyncio event loop, allowing other concurrent requests to proceed.
     cpu = psutil.cpu_percent(interval=0.5)
     mem = psutil.virtual_memory()
     disk = psutil.disk_usage("/")

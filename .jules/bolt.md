@@ -1,0 +1,3 @@
+## 2026-07-16 - [FastAPI Async Blocking]
+**Learning:** In FastAPI, using `async def` for a route handler means it runs directly on the main asyncio event loop. If that handler contains blocking calls (like `psutil.cpu_percent(interval=0.5)` or `time.sleep()`), it will block all other concurrent requests.
+**Action:** Always use synchronous `def` for FastAPI route handlers that contain blocking IO or long synchronous CPU operations. FastAPI automatically runs `def` handlers in a threadpool, preventing them from blocking the main event loop.
